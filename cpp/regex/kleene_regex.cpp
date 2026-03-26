@@ -11,7 +11,7 @@ kleene_regex::kleene_regex(int imput, regex* reg1) :
 	regex(imput), reg1(reg1) {
 	bool finite1 = reg1->get_finite();
 	if (finite1) {
-		int limit1 = reg1->limit;
+		int limit1 = reg1->get_limit();
 		if (limit1 == 0) {
 			finite = true;
 			limit = 0;
@@ -88,38 +88,38 @@ vector<int>* kleene_regex::generate(int seed) {
 }
 
 eNFA* kleene_regex::to_eNFA() const {
-	eNFA* enfa = reg1->to_eNFA();
-	if (enfa->get_state_count() == 1) { // empty_regex or eps_regex
+	eNFA* enfa = reg1->equivalent_eNFA();
+	if (enfa->state_count == 1) { // empty_regex or eps_regex
 		return enfa; 
 	}
 	int imput =  enfa->get_imput();
-	int enfa_states = enfa->get_state_count();
+	int enfa_states = enfa->state_count;
 	int states = enfa_states + 2;
-	enfa->set_state_count(states);
+	enfa->state_count = states;
 	for (int i = 0; i < enfa_states; i++) {
 		for (int j = 0; j < imput; j++) {
-			enfa->get_transition()->at(i).at(j)->set_limit(states);
+			enfa->transition->at(i).at(j)->set_limit(states);
 		}
-		enfa->get_e_links()->at(i)->set_limit(states);
+		enfa->e_links->at(i)->set_limit(states);
 	}
-	enfa->get_transition()->push_back(vector<int_set*>());
-	enfa->get_transition()->push_back(vector<int_set*>());
+	enfa->transition->push_back(vector<int_set*>());
+	enfa->transition->push_back(vector<int_set*>());
 	for (int j = 0; j < imput; j++) {
-		enfa->get_transition()->at(enfa_states).push_back(new int_set(states));
-		enfa->get_transition()->at(enfa_states + 1).push_back(new int_set(states));
+		enfa->transition->at(enfa_states).push_back(new int_set(states));
+		enfa->transition->at(enfa_states + 1).push_back(new int_set(states));
 	}
-	enfa->get_e_links()->push_back(new int_set(states));
-	enfa->get_e_links()->push_back(new int_set(states));
+	enfa->e_links->push_back(new int_set(states));
+	enfa->e_links->push_back(new int_set(states));
 	
-	enfa->get_e_links()->at(enfa->get_final_states()->get())->insert(states - 1);
-	enfa->get_e_links()->at(enfa->get_final_states()->get())->insert(enfa->get_initial_state());
-	enfa->get_e_links()->at(states - 2)->insert(enfa->get_initial_state());
-	enfa->get_e_links()->at(states - 2)->insert(states - 1);
+	enfa->e_links->at(enfa->final_states->get())->insert(states - 1);
+	enfa->e_links->at(enfa->final_states->get())->insert(enfa->initial_state);
+	enfa->e_links->at(states - 2)->insert(enfa->initial_state);
+	enfa->e_links->at(states - 2)->insert(states - 1);
 
 	enfa->set_initial_state(states - 2);
-	enfa->get_final_states()->clear();
-	enfa->get_final_states()->set_limit(states);
-	enfa->get_final_states()->insert(states - 1);
+	enfa->final_states->clear();
+	enfa->final_states->set_limit(states);
+	enfa->final_states->insert(states - 1);
 	
 	enfa->clear_metadata();
 

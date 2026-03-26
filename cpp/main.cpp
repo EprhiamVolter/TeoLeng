@@ -34,8 +34,7 @@ using namespace std;
  - RG to NFA
  - NFA to RG
 - regex to eNFA
- - make eNFA friend for set_state_count();
- - regex saves the eNFA
+ - kleene makes a copy
 - DFA to regex
 - parse regex
 - UG to NTM
@@ -380,7 +379,7 @@ void example_regex2eNFA(){
 	concat_regex* preend1 = new concat_regex(2,end1,both);
 	kleene_regex* lang = new kleene_regex(2,preend1);
 	
-	vector<regex*> reg_vec = {zero, one, two, train, both, all, start1, base2, end1, preend1, lang};
+	vector<regex*> reg_vec = {two, train, two};
 	vector<regex*> reg_test = {preend1};
 	for (regex* reg : reg_vec) {
 		cout << endl << reg->to_string() << endl;
@@ -394,6 +393,6 @@ void example_regex2eNFA(){
 }
 
 int main () {
-
+	example_regex2eNFA();
 	return 0;
 }

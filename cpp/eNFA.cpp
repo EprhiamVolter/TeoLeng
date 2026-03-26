@@ -51,27 +51,6 @@ bool eNFA::run(vector<int>* word) {
 	return states->intersect(final_states);
 }
 
-int eNFA::get_state_count() const {
-	return state_count;
-}
-
-int eNFA::get_initial_state() const {
-	return initial_state;
-}
-
-int_set* eNFA::get_final_states() const {
-	return final_states;
-}
-
-vector<vector<int_set*>>* eNFA::get_transition() const {
-	return transition;
-}
-
-vector<int_set*>* eNFA::get_e_links() const {
-	return e_links;
-}
-
-
 vector<int_set*>* eNFA::get_e_clause() {
 	if (!e_clause_valid) {
 		if (e_clause != nullptr) {
@@ -102,11 +81,6 @@ vector<int_set*>* eNFA::get_e_clause() {
 
 void eNFA::clear_metadata() {
 	e_clause_valid = false;
-}
-
-void eNFA::set_state_count(int new_states) {
-	e_clause_valid = false;
-	state_count = new_states;
 }
 
 void eNFA::set_initial_state(int new_initial) {

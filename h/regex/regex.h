@@ -18,9 +18,9 @@ class regex : public grammar {
 	protected:
 		bool finite;
 		int limit;
-		virtual eNFA* to_eNFA() const = 0;
 		
 	private:
+		virtual eNFA* to_eNFA() const = 0;
 		eNFA* my_eNFA;
 };
 
