@@ -33,8 +33,6 @@ using namespace std;
 - RG
  - RG to NFA
  - NFA to RG
-- regex to eNFA
- - kleene makes a copy
 - DFA to regex
 - parse regex
 - UG to NTM

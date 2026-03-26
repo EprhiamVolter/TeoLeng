@@ -93,37 +93,36 @@ eNFA* kleene_regex::to_eNFA() const {
 		return enfa; 
 	}
 	int imput =  enfa->get_imput();
-	int enfa_states = enfa->state_count;
-	int states = enfa_states + 2;
-	enfa->state_count = states;
-	for (int i = 0; i < enfa_states; i++) {
+	int states = enfa->state_count + 2;
+	int_set* finals = new int_set(states,{states - 1});
+	vector<vector<int_set*>>* transition = new vector<vector<int_set*>>{};
+	vector<int_set*>* e_links = new vector<int_set*>{};
+	for (int i = 0; i < enfa->state_count; i++) {
+		transition->push_back(vector<int_set*>());
 		for (int j = 0; j < imput; j++) {
-			enfa->transition->at(i).at(j)->set_limit(states);
+			int_set* to_add = new int_set(*(enfa->transition->at(i).at(j)),false);
+			to_add->set_limit(states);
+			transition->at(i).push_back(to_add);
 		}
-		enfa->e_links->at(i)->set_limit(states);
+		int_set* to_add = new int_set(*(enfa->e_links->at(i)),false);
+		to_add->set_limit(states);
+		e_links->push_back(to_add);
 	}
-	enfa->transition->push_back(vector<int_set*>());
-	enfa->transition->push_back(vector<int_set*>());
+	transition->push_back(vector<int_set*>());
+	transition->push_back(vector<int_set*>());
 	for (int j = 0; j < imput; j++) {
-		enfa->transition->at(enfa_states).push_back(new int_set(states));
-		enfa->transition->at(enfa_states + 1).push_back(new int_set(states));
+		transition->at(states -2).push_back(new int_set(states));
+		transition->at(states - 1).push_back(new int_set(states));
 	}
-	enfa->e_links->push_back(new int_set(states));
-	enfa->e_links->push_back(new int_set(states));
+	e_links->push_back(new int_set(states));
+	e_links->push_back(new int_set(states));
 	
-	enfa->e_links->at(enfa->final_states->get())->insert(states - 1);
-	enfa->e_links->at(enfa->final_states->get())->insert(enfa->initial_state);
-	enfa->e_links->at(states - 2)->insert(enfa->initial_state);
-	enfa->e_links->at(states - 2)->insert(states - 1);
+	e_links->at(enfa->final_states->get())->insert(states - 1);
+	e_links->at(enfa->final_states->get())->insert(enfa->initial_state);
+	e_links->at(states - 2)->insert(enfa->initial_state);
+	e_links->at(states - 2)->insert(states - 1);
 
-	enfa->set_initial_state(states - 2);
-	enfa->final_states->clear();
-	enfa->final_states->set_limit(states);
-	enfa->final_states->insert(states - 1);
-	
-	enfa->clear_metadata();
-
-	return enfa;
+	return new eNFA(imput, states, states - 2, finals, transition, e_links);
 }
 
 string kleene_regex::to_string() const {
