@@ -5,6 +5,8 @@
 #include "grammar.h"
 #include "eNFA.h"
 
+class eNFA;
+
 using namespace std;
 
 class regex : public grammar {	

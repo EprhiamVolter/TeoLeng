@@ -1,13 +1,19 @@
 #ifndef eNFA_cpp
 #define eNFA_cpp
 
-#include "eNFA.h"
 #include <iostream>
+#include "eNFA.h"
+#include "regex/empty_regex.h"
+#include "regex/eps_regex.h"
+#include "regex/lit_regex.h"
+#include "regex/alter_regex.h"
+#include "regex/concat_regex.h"
+#include "regex/kleene_regex.h"
 
 using namespace std;
 
 eNFA::eNFA(int imput, int states, int initial, int_set* finals, vector<vector<int_set*>>* transition, vector<int_set*>* e_links) : 
-	automaton(imput), state_count(states), initial_state(initial), final_states(finals), transition(transition), e_links(e_links), e_clause(nullptr), e_clause_valid(false) {
+	automaton(imput), state_count(states), initial_state(initial), final_states(finals), transition(transition), e_links(e_links), e_clause(nullptr), e_clause_valid(false), my_regex(nullptr) {
 }
 
 eNFA eNFA::safe_eNFA(int imput, int states, int initial, int_set* finals, vector<vector<int_set*>>* transition, vector<int_set*>* e_links) {
@@ -106,6 +112,66 @@ NFA* eNFA::equivalent_NFA() {
 		}
 	}
 	return new NFA(get_imput(), state_count, initial_state, NFA_finals, NFA_transition);
+}
+
+regex* eNFA::kleene() {
+	if (my_regex == nullptr) {
+		if (final_states->get_size() > 0) {
+			vector<vector<vector<regex*>>> R(state_count + 1, vector<vector<regex*>>(state_count, vector<regex*>(state_count, nullptr)));
+			for (int j = 0; j < state_count; j++) {
+				for (int k = 0; k < state_count; k++) {
+					int_set syms(get_imput());
+					for (int s = 0; s < get_imput(); s++) {
+						if (transition->at(j).at(s)->elem(k)) {
+							syms.insert(s);
+						}
+					}
+					regex* zjk;
+					if (j == k || e_links->at(j)->elem(k)) {
+						zjk = new eps_regex(get_imput());
+						for (int s : syms) {
+							zjk = new alter_regex(get_imput(), zjk, new lit_regex(get_imput(), s));
+						}
+					} else {
+						if (syms.get_size() > 0) {
+							int s0 = syms.get();
+							syms.remove(s0);
+							zjk = new lit_regex(get_imput(), s0);
+							for (int s : syms) {
+								zjk = new alter_regex(get_imput(), zjk, new lit_regex(get_imput(), s));
+							}
+						} else {
+							zjk = new empty_regex(get_imput());
+						}
+					}
+					R.at(0).at(j).at(k) = zjk;
+				}
+			}
+			for (int i = 0; i < state_count; i++) {
+				for (int j = 0; j < state_count; j++) {
+					for (int k = 0; k < state_count; k++) {
+						R.at(i+1).at(j).at(k) = new alter_regex(get_imput(),
+							R.at(i).at(j).at(k),
+							new concat_regex(get_imput(), 
+								R.at(i).at(j).at(i),
+								new concat_regex(get_imput(),
+									new kleene_regex(get_imput(), R.at(i).at(i).at(i)),
+									R.at(i).at(i).at(k))));
+					}
+				}
+			}
+			int fin = final_states->get();
+			final_states->remove(fin);
+			my_regex = R.at(state_count).at(initial_state).at(fin);
+			for (int f : *final_states) {
+				my_regex = new alter_regex(get_imput(), my_regex, R.at(state_count).at(initial_state).at(f));
+			}
+			final_states->insert(fin);
+		} else {
+			my_regex = new empty_regex(get_imput());
+		} 
+	}
+	return my_regex;
 }
 
 void eNFA::print() const {

@@ -93,6 +93,7 @@ int_set* CFG::get_nullables() {
 				}
 			}
 		}
+		nullables_valid = true;
 	}
 	return &nullables;
 }
@@ -127,6 +128,7 @@ int_set* CFG::get_positives() {
 			}
 			s++;
 		}
+		positives_valid = true;
 	}
 	return &positives;
 }
@@ -148,6 +150,7 @@ int_set* CFG::get_reachables() {
 				}
 			}
 		}
+		reachables_valid = true;
 	}
 	return &reachables;
 }
@@ -189,6 +192,7 @@ int_set* CFG::get_usefuls() {
 				}
 			}
 		}
+		usefuls_valid = true;
 	}
 	return &usefuls;
 }
@@ -202,6 +206,7 @@ vector<int>* CFG::get_terminal_vars() {
 				terminal_vars.at(rules->at(i).at(0).at(0)) = i;
 			}
 		}
+		terminal_vars_valid = true;
 	}
 	return &terminal_vars;
 }

@@ -23,23 +23,38 @@ using namespace std;
 
 /* TODO:
 
+General:
 - add many metadata
+- make as many pointers as possible static
+- properly comment everything
+- tests
+
+Features:
 - CYK algorithm
 - CFG to GNF
  - GNF to NDPA
  - NDPA to GNF?
 - CFG to FNF (Floyd Normal Form)
-- make as many pointers as possible static
 - RG
  - RG to NFA
  - NFA to RG
-- DFA to regex
+- NFA to regex 
+- genalized regex (+ complement)
+ - Equation algorithm
+ - Kleenes algorithm
+- trivial generalizations
+ - DFA to NFA
+ - NFA to eNFA
+ - DFA to DPDA
+ - eNFA to NPDA
+ - DPDA to NPDA
+ - DPDA to TM
+ - NPDA to NTM
+ - TM to NTM
 - parse regex
 - UG to NTM
 - NTM to TM
 - TM to UG
-- properly comment everything
-- tests
 */
 
 void print_vec(vector<int>* p) {
@@ -391,6 +406,5 @@ void example_regex2eNFA(){
 }
 
 int main () {
-	example_regex2eNFA();
 	return 0;
 }

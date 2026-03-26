@@ -1,8 +1,8 @@
 #ifndef NFA_cpp
 #define NFA_cpp
 
-#include "NFA.h"
 #include <iostream>
+#include "NFA.h"
 
 using namespace std;
 

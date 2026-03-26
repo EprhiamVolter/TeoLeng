@@ -1,8 +1,8 @@
 #ifndef DFA_cpp
 #define DFA_cpp
 
-#include "DFA.h"
 #include <iostream>
+#include "DFA.h"
 
 using namespace std;
 

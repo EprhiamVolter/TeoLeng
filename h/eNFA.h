@@ -4,6 +4,9 @@
 #include "automaton.h"
 #include "int_set.h"
 #include "NFA.h"
+#include "regex/regex.h"
+
+class regex;
 
 using namespace std;
 
@@ -23,11 +26,13 @@ class eNFA : public automaton {
 		void clear_metadata();
 		void set_initial_state(int new_initial);
 		NFA* equivalent_NFA();
+		regex* kleene();
 		void print() const;
 		
 	private:
 		vector<int_set*>* e_clause;
 		bool e_clause_valid;
+		regex* my_regex;
 		
 		friend class alter_regex;
 		friend class concat_regex;
