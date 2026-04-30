@@ -7,6 +7,9 @@ DEP = $(OBJ:%.o=%.d)
 run: main.exe
 	@./main.exe
 	
+valgrind: main.exe
+	@valgrind ./main.exe
+	
 main : main.exe
 
 main.exe: $(OBJ)

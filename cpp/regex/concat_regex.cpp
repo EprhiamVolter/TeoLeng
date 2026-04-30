@@ -79,11 +79,9 @@ eNFA* concat_regex::to_eNFA() const {
 	for (int i = 0; i < 2; ++i) {
 		if (enfas[i]->state_count == 1) {
 			if (enfas[i]->final_states->elem(0)) { // eps_regex
-				delete enfas[i];
 				return enfas[1 - i]; 
 			} 
 			else { // empty_regex
-				delete enfas[1 - i];
 				return enfas[i]; 
 			}
 		}
@@ -123,8 +121,6 @@ eNFA* concat_regex::to_eNFA() const {
 		i2++;
 	}
 	e_links->at(enfa1->final_states->get())->insert(enfa1->state_count + enfa2->initial_state);
-	delete enfa1;
-	delete enfa2;
 	return new eNFA(imput, states, enfa1->initial_state, finals, transition, e_links);
 }
 

@@ -6,6 +6,7 @@
 #include "NFA.h"
 #include "regex/regex.h"
 
+class NFA;
 class regex;
 
 using namespace std;

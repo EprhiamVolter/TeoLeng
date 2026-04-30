@@ -4,8 +4,11 @@
 #include "automaton.h"
 #include "int_set.h"
 #include "DFA.h"
+#include "regex/regex.h"
 
 using namespace std;
+
+class regex;
 
 class NFA : public automaton {
 	private:
@@ -20,10 +23,12 @@ class NFA : public automaton {
 		bool run(vector<int>* word);
 		DFA* equivalent_DFA() const;
 		DFA* equivalent_connex_DFA() const;
+		regex* equivalent_regex();
 		void print() const;
 		
 	private:
 		void compute_DFA(int x, int pos, int_set *it, int_set* fin, vector<vector<int>>* tran) const;
+		regex* my_regex;
 };
 
 #endif

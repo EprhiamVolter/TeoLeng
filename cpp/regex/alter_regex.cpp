@@ -57,7 +57,6 @@ eNFA* alter_regex::to_eNFA() const {
 	eNFA* enfa2 = enfas[1];
 	for (int i = 0; i < 2; ++i) {
 		if (enfas[i]->state_count == 1 && !enfas[i]->final_states->elem(0)) { // empty_regex
-			delete enfas[i];
 			return enfas[1 - i]; 
 		}
 	}
@@ -111,8 +110,6 @@ eNFA* alter_regex::to_eNFA() const {
 	e_links->at(enfa1->final_states->get())->insert(states - 1);
 	e_links->at(states - 2)->insert(enfa2->initial_state + enfa1->state_count);
 	e_links->at(enfa2->final_states->get() + enfa1->state_count)->insert(states - 1);
-	delete enfa1;
-	delete enfa2;
 	return new eNFA(imput, states, states - 2, finals, transition, e_links);
 }
 

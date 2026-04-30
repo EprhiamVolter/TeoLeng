@@ -25,8 +25,10 @@ using namespace std;
 
 General:
 - add many metadata
+ - conversion inverts
 - make as many pointers as possible static
 - properly comment everything
+- memory management
 - tests
 
 Features:
@@ -38,10 +40,9 @@ Features:
 - RG
  - RG to NFA
  - NFA to RG
-- NFA to regex 
 - genalized regex (+ complement)
- - Equation algorithm
- - Kleenes algorithm
+- NFA to regex, Equation algorithm, make example
+- add NFA to DFA overflow management
 - trivial generalizations
  - DFA to NFA
  - NFA to eNFA
@@ -53,8 +54,8 @@ Features:
  - TM to NTM
 - parse regex
 - UG to NTM
+- NTM to UG
 - NTM to TM
-- TM to UG
 */
 
 void print_vec(vector<int>* p) {
@@ -405,6 +406,74 @@ void example_regex2eNFA(){
 	
 }
 
+void example_eNFA2regex() {
+	// L doesn't have 2 1's in a row
+	int_set* finals = new int_set(2,{1});
+	vector<vector<int_set*>>* transition = new vector<vector<int_set*>>
+	{{new int_set(2,{0}),new int_set(2,{1})},
+	 {new int_set(2,{0}),new int_set(2,{})}};
+	vector<int_set*>* e_links = new vector<int_set*>
+	{new int_set(2,{1}),new int_set(2,{})}; 
+	eNFA* enfa = new eNFA(eNFA::safe_eNFA(2,2,0,finals,transition,e_links));
+	
+	regex* reg = enfa->kleene();
+	cout << reg->to_string() << endl;
+/*
+output string:
+	e|1|(e|0).(e|0)*.(e|1)|(e|1|(e|0).(e|0)*.(e|1)).(e|0.(e|0)*.(e|1))*.(e|0.(e|0)*.(e|1))
+sparate by top level alternations:
+	e|
+	1|
+	(e|0).(e|0)*.(e|1)|
+	(e|1|(e|0).(e|0)*.(e|1)).(e|0.(e|0)*.(e|1))*.(e|0.(e|0)*.(e|1))
+simplify that in the fouth term. remove 'or epsilon' inside kleene stars:
+	(e|1|(e|0).(e|0)*.(e|1)).(e|0.(e|0)*.(e|1))*.(e|0.(e|0)*.(e|1)) =
+	(e|1|0*.(e|1)).(e|0.(e|0)*.(e|1))*.(e|0.(e|0)*.(e|1))
+	(e|1|0*.(e|1)).(0.0*.(e|1))*.(e|0.0*.(e|1))
+separate this term in three concatenations:
+	(e|1|0*.(e|1)).
+	(0.0*.(e|1))*.
+	(e|0.0*.(e|1))
+the first term allows starting with 1,
+the second if not e, forces each term to start with at least one 0 and end with a single 1.
+the third allows ending ending with 0's
+The fourth (original) term therefore generates the entire language and nothing else. The first three clearly dont break it either.
+*/
+	eNFA* enfa2 = reg->equivalent_eNFA();
+	regex* all = new kleene_regex(2, new alter_regex(2, new lit_regex(2,0), new lit_regex(2,1)));
+	cout << "diferences in enfas:\n";
+	for (int i = 0; i < 1000; i++) {
+		vector<int>* word = all->generate(i);
+		if (enfa->run(word) != enfa2->run(word)) {
+			cout << "ehmm, wrong: ";
+			print_vec(word);
+		}
+		delete word;
+	}
+	/* 
+	NFA* nfa = enfa2->equivalent_NFA();
+	DFA* dfa = nfa->equivalent_connex_DFA(); // fails due ovewflow. 
+	dfa->minimize();
+	dfa->print();
+	*/
+}
+
+void example_NFA2regex() {
+	// L doesn't have 2 1's in a row
+	int_set* finals = new int_set(2,{0,1});
+	vector<vector<int_set*>>* transition = new vector<vector<int_set*>>
+	{{new int_set(2,{}),new int_set(2,{1})},
+	 {new int_set(2,{0}),new int_set(2,{})}};
+	NFA* nfa = new NFA(NFA::safe_NFA(2,2,0,finals,transition));
+	nfa->print();
+	
+	regex* reg = nfa->equivalent_regex();
+	if (reg)  {
+		cout << reg->to_string() << endl;
+	}
+}
+
 int main () {
+	example_NFA2regex();
 	return 0;
 }
